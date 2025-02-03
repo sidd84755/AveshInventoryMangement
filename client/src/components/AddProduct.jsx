@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import {
+  Box,
+  Card,
+  CardHeader,
+  CardContent,
+  TextField,
+  Button,
+  Grid,
+  InputAdornment,
+} from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 const AddProduct = ({ fetchProducts, showAlert }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    stock: ''
+    stock: '',
   });
 
   const handleSubmit = async (e) => {
@@ -18,19 +28,19 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          stock: parseInt(formData.stock)
-        })
+          stock: parseInt(formData.stock, 10),
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to add product');
-      
+
       fetchProducts();
       showAlert('Product added successfully!', 'success');
-      setFormData({ 
-        name: '', 
-        description: '', 
-        price: '', 
-        stock: '' 
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        stock: '',
       });
     } catch (err) {
       showAlert(err.message, 'danger');
@@ -38,70 +48,98 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
   };
 
   return (
-    <div className="card">
-      <div className="card-header bg-primary text-white">
-        <h5 className="mb-0">📦 Add New Product</h5>
-      </div>
-      <div className="card-body">
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Product Name</Form.Label>
-            <Form.Control 
-              type="text" 
+    <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
+      <Card>
+        <CardHeader
+          title={
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              <span role="img" aria-label="inventory" style={{ marginRight: 8 }}>
+              📦
+              </span>
+              Add New Product
+            </Typography>
+          }
+          sx={{
+            backgroundColor: 'primary.dark',
+            color: 'primary.contrastText',
+            px: 2,
+            py: 1,
+          }}
+        />
+        <CardContent>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              fullWidth
+              label="Product Name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
+              margin="normal"
             />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={2}
+            <TextField
+              fullWidth
+              label="Description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              multiline
+              rows={3}
+              margin="normal"
             />
-          </Form.Group>
-
-          <div className="row">
-            <div className="col-md-6">
-              <Form.Group className="mb-3">
-                <Form.Label>Price</Form.Label>
-                <div className="input-group">
-                  <span className="input-group-text">$</span>
-                  <Form.Control
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
-                  />
-                </div>
-              </Form.Group>
-            </div>
-
-            <div className="col-md-6">
-              <Form.Group className="mb-3">
-                <Form.Label>Initial Stock</Form.Label>
-                <Form.Control
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Price"
                   type="number"
-                  min="0"
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  inputProps={{ step: '0.01', min: '0' }}
+                  value={formData.price}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
                   required
+                  margin="normal"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">₹</InputAdornment>
+                    ),
+                  }}
                 />
-              </Form.Group>
-            </div>
-          </div>
-
-          <Button variant="primary" type="submit" className="w-100">
-            Add Product
-          </Button>
-        </Form>
-      </div>
-    </div>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Initial Stock"
+                  type="number"
+                  inputProps={{ min: '0' }}
+                  value={formData.stock}
+                  onChange={(e) =>
+                    setFormData({ ...formData, stock: e.target.value })
+                  }
+                  required
+                  margin="normal"
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 3 }}
+            >
+              Add Product
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

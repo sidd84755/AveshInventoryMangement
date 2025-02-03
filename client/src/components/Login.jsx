@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, Alert } from 'react-bootstrap';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardActions,
+  TextField,
+  Button,
+  Alert,
+  Typography,
+  Avatar,
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const Login = ({ onLogin, adminUsername, adminPassword }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -23,37 +34,87 @@ const Login = ({ onLogin, adminUsername, adminPassword }) => {
   };
 
   return (
-    <div className="login-container">
-      <Form onSubmit={handleSubmit} className="login-form">
-        <h2 className="mb-4">Inventory Manager Login</h2>
-        {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
-        
-        <Form.Group className="mb-3">
-          <Form.Label>Username</Form.Label>
-          <Form.Control
-            type="text"
-            value={credentials.username}
-            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-            required
-            autoFocus
-          />
-        </Form.Group>
-        
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={credentials.password}
-            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-            required
-          />
-        </Form.Group>
-        
-        <Button variant="primary" type="submit" className="w-100">
-          Login
-        </Button>
-      </Form>
-    </div>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: 'background.default',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Card sx={{ width: 350, boxShadow: 3 }}>
+        <CardContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" marginTop={2} marginBottom={2}>
+            Avesh Trading Company
+          </Typography>
+          <Typography component="h1" variant="h5">
+            Login
+          </Typography>
+          {error && (
+            <Alert
+              severity="error"
+              sx={{ width: '100%', mt: 2 }}
+              onClose={() => setError('')}
+            >
+              {error}
+            </Alert>
+          )}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 2, width: '100%' }}
+          >
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Username"
+              value={credentials.username}
+              onChange={(e) =>
+                setCredentials({ ...credentials, username: e.target.value })
+              }
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              value={credentials.password}
+              onChange={(e) =>
+                setCredentials({ ...credentials, password: e.target.value })
+              }
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Login
+            </Button>
+          </Box>
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            © {new Date().getFullYear()} Inventory Manager
+          </Typography>
+        </CardActions>
+      </Card>
+    </Box>
   );
 };
 

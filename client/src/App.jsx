@@ -1,14 +1,82 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Container, Alert } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import AppNavbar from './components/Navbar';
 import Login from './components/Login';
 import AddProductSection from './components/Sections/AddProductSection';
 import RecordSaleSection from './components/Sections/RecordSaleSection';
 import InventorySection from './components/Sections/InventorySection';
 import SalesSection from './components/Sections/SalesSection';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+
+// Import MUI and Toolpad components for the sidebar layout
+import { createTheme } from '@mui/material/styles';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PropTypes from 'prop-types';
+
+const NAVIGATION = [
+  { kind: 'header', title: 'Main items' },
+  {
+    segment: 'inventory',
+    title: 'Inventory',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'sales',
+    title: 'Sales',
+    icon: <TimelineIcon />,
+  },
+  {
+    segment: 'add-product',
+    title: 'Add Product',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'record-sale',
+    title: 'Record Sale',
+    icon: <TimelineIcon />,
+  },
+  {
+    segment: 'logout',
+    title: 'Logout',
+    icon: <LogoutIcon />,
+  },
+];
+
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
+
+function LogoutRoute({ onLogout }) {
+  useEffect(() => {
+    onLogout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <Navigate to="/login" replace />;
+}
+
+LogoutRoute.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -73,11 +141,40 @@ function App() {
     }
   }, [isAuthenticated]);
 
+  // function CustomHeader({ onLogout }) {
+  //   return (
+  //     <AppBar position="static" color="default" elevation={1}>
+  //       <Toolbar>
+  //         {/* <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+  //           Inventory Manager
+  //         </Typography> */}
+  //         <Button color="inherit" onClick={onLogout}>
+  //           Logout
+  //         </Button>
+  //       </Toolbar>
+  //     </AppBar>
+  //   );
+  // }
+
+  // CustomHeader.propTypes = {
+  //   onLogout: PropTypes.func.isRequired,
+  // };
+
   const ProtectedLayout = () => (
     <>
-      <AppNavbar onLogout={handleLogout} />
-      <Container className="mt-4">
-        {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
+    <AppProvider navigation={NAVIGATION} theme={demoTheme} 
+    branding={{
+    logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+    title: 'Avesh Trading Company',
+  }}>
+    <DashboardLayout defaultSidebarCollapsed>
+    {/* <CustomHeader onLogout={handleLogout} /> */}
+      {/* <AppNavbar onLogout={handleLogout} /> */}
+      <Container>
+      {alert && (
+              <Typography variant="body1" color="error">
+                {alert.message}
+              </Typography>)}
         <Routes>
           <Route path="/" element={<Navigate to="/inventory" replace />} />
           <Route
@@ -109,8 +206,14 @@ function App() {
             path="/sales"
             element={<SalesSection sales={sales} />}
           />
+           <Route
+                path="/logout"
+                element={<LogoutRoute onLogout={handleLogout} />}
+            />
         </Routes>
       </Container>
+      </DashboardLayout>
+      </AppProvider>
     </>
   );
 
@@ -121,8 +224,8 @@ function App() {
           <Route
             path="/login"
             element={
-              <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
-                <div className="w-100" style={{ maxWidth: '400px' }}>
+              <Container>
+                <div className="">
                   <Login 
                     onLogin={handleLogin}
                     adminUsername={ADMIN_USERNAME}

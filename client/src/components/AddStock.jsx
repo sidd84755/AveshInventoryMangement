@@ -1,4 +1,4 @@
-// RecordSale.jsx
+// AddStockSection.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -11,15 +11,18 @@ import {
   Autocomplete,
 } from '@mui/material';
 
-const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
+const AddStock = ({ products, fetchProducts, showAlert }) => {
   const [formData, setFormData] = useState({
     productId: '',
     quantity: '',
-    salePrice: '',
   });
   const [currentStock, setCurrentStock] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  console.log('RecordSale', products);
+
+  // Log just the products array to verify
+  useEffect(() => {
+    console.log('Products:', products); // Should log an array of products
+  }, [products]);
 
   // When a product is selected, update the formData and current stock.
   useEffect(() => {
@@ -35,29 +38,29 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/sales', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: formData.productId,
-          quantity: parseInt(formData.quantity, 10),
-          salePrice: parseFloat(formData.salePrice),
-        }),
-      });
+      const res = await fetch(
+        `/api/products/${formData.productId}/addStock`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quantity: parseInt(formData.quantity, 10),
+          }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to record sale');
+        throw new Error(errorData.message || 'Failed to add stock');
       }
 
-      fetchProducts();
-      fetchSales();
-      showAlert('Sale recorded successfully!', 'success');
-      setFormData({ productId: '', quantity: '', salePrice: '' });
+      products.fetchProducts();
+      products.showAlert('Stock added successfully!', 'success');
+      setFormData({ productId: '', quantity: '' });
       setSelectedProduct(null);
       setCurrentStock(null);
     } catch (err) {
-      showAlert(err.message, 'danger');
+        products.showAlert(err.message, 'danger');
     }
   };
 
@@ -71,10 +74,10 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
               component="div"
               sx={{ display: 'flex', alignItems: 'center' }}
             >
-              <span role="img" aria-label="inventory" style={{ marginRight: 8 }}>
-                💰
+              <span role="img" aria-label="stock" style={{ marginRight: 8 }}>
+                📦
               </span>
-              Record Sales
+              Add Stock
             </Typography>
           }
           sx={{
@@ -88,8 +91,9 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             {/* Searchable Product Autocomplete */}
             <Autocomplete
-              options={products}
-              getOptionLabel={(option) => option.name}
+              openOnFocus
+              options={Array.isArray(products.products) ? products.products : []}
+              getOptionLabel={(option) => option.name || ''}
               isOptionEqualToValue={(option, value) => option._id === value._id}
               value={selectedProduct || null}
               onChange={(e, newValue) => setSelectedProduct(newValue)}
@@ -112,37 +116,16 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
             <TextField
               fullWidth
               margin="normal"
-              label="Quantity"
+              label="Quantity to Add"
               type="number"
               inputProps={{ min: 1 }}
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               required
             />
 
-            {/* New Sale Price Field */}
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Sale Price"
-              type="number"
-              inputProps={{ min: 0, step: '0.01' }}
-              value={formData.salePrice}
-              onChange={(e) =>
-                setFormData({ ...formData, salePrice: e.target.value })
-              }
-              required
-            />
-
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              Record Sale
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+              Add Stock
             </Button>
           </Box>
         </CardContent>
@@ -151,4 +134,4 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   );
 };
 
-export default RecordSale;
+export default AddStock;

@@ -19,6 +19,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PropTypes from 'prop-types';
+import AddStockSection from './components/Sections/AddStockSection';
 
 const NAVIGATION = [
   { kind: 'header', title: 'Main items' },
@@ -35,6 +36,11 @@ const NAVIGATION = [
   {
     segment: 'add-product',
     title: 'Add Product',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'addStock',
+    title: 'Add Stock',
     icon: <DashboardIcon />,
   },
   {
@@ -181,6 +187,10 @@ function App() {
           <Route
             path="/add-product"
             element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
+          />
+            <Route
+              path="/addStock"
+              element={<AddStockSection products={products} fetchProducts={fetchProducts} fetchSales={fetchSales} showAlert={showAlert} />}
           />
           <Route
             path="/record-sale"

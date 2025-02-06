@@ -1,20 +1,35 @@
+// RecordSale.jsx
 import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {
+  Box,
+  Card,
+  CardHeader,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Autocomplete,
+} from '@mui/material';
 
 const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   const [formData, setFormData] = useState({
     productId: '',
-    quantity: ''
+    quantity: '',
+    salePrice: '',
   });
   const [currentStock, setCurrentStock] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // When a product is selected, update the formData and current stock.
   useEffect(() => {
-    if (formData.productId) {
-      const selectedProduct = products.find(p => p._id === formData.productId);
-      setCurrentStock(selectedProduct?.stock || 0);
+    if (selectedProduct) {
+      setFormData((prev) => ({ ...prev, productId: selectedProduct._id }));
+      setCurrentStock(selectedProduct.stock);
+    } else {
+      setFormData((prev) => ({ ...prev, productId: '' }));
+      setCurrentStock(null);
     }
-  }, [formData.productId, products]);
+  }, [selectedProduct]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,8 +39,9 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: formData.productId,
-          quantity: parseInt(formData.quantity)
-        })
+          quantity: parseInt(formData.quantity, 10),
+          salePrice: parseFloat(formData.salePrice),
+        }),
       });
 
       if (!res.ok) {
@@ -36,7 +52,8 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
       fetchProducts();
       fetchSales();
       showAlert('Sale recorded successfully!', 'success');
-      setFormData({ productId: '', quantity: '' });
+      setFormData({ productId: '', quantity: '', salePrice: '' });
+      setSelectedProduct(null);
       setCurrentStock(null);
     } catch (err) {
       showAlert(err.message, 'danger');
@@ -44,50 +61,92 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   };
 
   return (
-    <div className="card">
-      <div className="card-header bg-success text-white">
-        <h5 className="mb-0">💰 Record Sale</h5>
-      </div>
-      <div className="card-body">
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Product</Form.Label>
-            <Form.Select 
-              value={formData.productId}
-              onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
-              required
+    <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
+      <Card>
+        <CardHeader
+          title={
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ display: 'flex', alignItems: 'center' }}
             >
-              <option value="">Select a product</option>
-              {products.map(product => (
-                <option key={product._id} value={product._id}>
-                  {product.name}
-                </option>
-              ))}
-            </Form.Select>
+              <span role="img" aria-label="inventory" style={{ marginRight: 8 }}>
+                💰
+              </span>
+              Record Sales
+            </Typography>
+          }
+          sx={{
+            backgroundColor: 'primary.dark',
+            color: 'primary.contrastText',
+            px: 2,
+            py: 1,
+          }}
+        />
+        <CardContent>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            {/* Searchable Product Autocomplete */}
+            <Autocomplete
+              options={products}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option._id === value._id}
+              value={selectedProduct || null}
+              onChange={(e, newValue) => setSelectedProduct(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Product"
+                  variant="outlined"
+                  margin="normal"
+                  required
+                />
+              )}
+            />
             {currentStock !== null && (
-              <div className="text-muted small mt-1">
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
                 Current Stock: {currentStock}
-              </div>
+              </Typography>
             )}
-          </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Quantity</Form.Label>
-            <Form.Control
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Quantity"
               type="number"
-              min="1"
+              inputProps={{ min: 1 }}
               value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, quantity: e.target.value })
+              }
               required
             />
-          </Form.Group>
 
-          <Button variant="success" type="submit" className="w-100">
-            Record Sale
-          </Button>
-        </Form>
-      </div>
-    </div>
+            {/* New Sale Price Field */}
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Sale Price"
+              type="number"
+              inputProps={{ min: 0, step: '0.01' }}
+              value={formData.salePrice}
+              onChange={(e) =>
+                setFormData({ ...formData, salePrice: e.target.value })
+              }
+              required
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Record Sale
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

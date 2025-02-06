@@ -1,3 +1,4 @@
+// sales.js
 const express = require('express');
 const router = express.Router();
 const Sale = require('../models/Sale');
@@ -13,12 +14,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Insufficient stock' });
     }
 
+    // Deduct the quantity from product stock
     product.stock -= req.body.quantity;
     await product.save();
 
+    // Create the sale record with the new salePrice field
     const sale = new Sale({
       product: req.body.productId,
-      quantity: req.body.quantity
+      quantity: req.body.quantity,
+      salePrice: req.body.salePrice,
     });
 
     const newSale = await sale.save();
@@ -31,7 +35,10 @@ router.post('/', async (req, res) => {
 // Get recent sales
 router.get('/', async (req, res) => {
   try {
-    const sales = await Sale.find().sort('-saleDate').limit(10).populate('product');
+    const sales = await Sale.find()
+      .sort('-saleDate')
+      // .limit(10)
+      .populate('product');
     res.json(sales);
   } catch (err) {
     res.status(500).json({ message: err.message });

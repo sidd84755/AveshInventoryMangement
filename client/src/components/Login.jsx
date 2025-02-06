@@ -56,7 +56,7 @@ const Login = ({ onLogin, adminUsername, adminPassword }) => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5" marginTop={2} marginBottom={2}>
-            Avesh Trading Company
+            Avesh Home Solutions
           </Typography>
           <Typography component="h1" variant="h5">
             Login

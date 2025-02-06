@@ -133,6 +133,7 @@ function App() {
     }
   };
 
+
   useEffect(() => {
     setIsAuthenticated(validateAuth());
     if (isAuthenticated) {
@@ -165,7 +166,7 @@ function App() {
     <AppProvider navigation={NAVIGATION} theme={demoTheme} 
     branding={{
     logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-    title: 'Avesh Trading Company',
+    title: 'Avesh Home Solutions',
   }}>
     <DashboardLayout defaultSidebarCollapsed>
     {/* <CustomHeader onLogout={handleLogout} /> */}
@@ -204,7 +205,7 @@ function App() {
           />
           <Route
             path="/sales"
-            element={<SalesSection sales={sales} />}
+            element={<SalesSection sales={sales} fetchSales={fetchSales}/>}
           />
            <Route
                 path="/logout"

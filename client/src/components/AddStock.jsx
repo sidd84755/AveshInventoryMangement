@@ -20,9 +20,9 @@ const AddStock = ({ products, fetchProducts, showAlert }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Log just the products array to verify
-  useEffect(() => {
-    console.log('Products:', products); // Should log an array of products
-  }, [products]);
+  // useEffect(() => {
+  //   console.log('Products:', products); // Should log an array of products
+  // }, [products]);
 
   // When a product is selected, update the formData and current stock.
   useEffect(() => {

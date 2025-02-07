@@ -1,7 +1,7 @@
 // sale.js
 const mongoose = require('mongoose');
 
-const saleSchema = new mongoose.Schema({
+const saleItemSchema = new mongoose.Schema({
   product: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
@@ -14,7 +14,15 @@ const saleSchema = new mongoose.Schema({
   salePrice: {
     type: Number,
     required: true
+  }
+});
+
+const saleSchema = new mongoose.Schema({
+  customerName: {
+    type: String,
+    required: true,
   },
+  items: [saleItemSchema],
   saleDate: { 
     type: Date, 
     default: Date.now 

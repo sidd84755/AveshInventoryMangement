@@ -7,8 +7,8 @@ import AddProductSection from './components/Sections/AddProductSection';
 import RecordSaleSection from './components/Sections/RecordSaleSection';
 import InventorySection from './components/Sections/InventorySection';
 import SalesSection from './components/Sections/SalesSection';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import AddStockSection from './components/Sections/AddStockSection';
+import SaleReceipt from './components/SaleReceipt'; // Import your receipt component
 
 // Import MUI and Toolpad components for the sidebar layout
 import { createTheme } from '@mui/material/styles';
@@ -19,7 +19,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PropTypes from 'prop-types';
-import AddStockSection from './components/Sections/AddStockSection';
+import './App.css';
 
 const NAVIGATION = [
   { kind: 'header', title: 'Main items' },
@@ -139,7 +139,6 @@ function App() {
     }
   };
 
-
   useEffect(() => {
     setIsAuthenticated(validateAuth());
     if (isAuthenticated) {
@@ -148,82 +147,64 @@ function App() {
     }
   }, [isAuthenticated]);
 
-  // function CustomHeader({ onLogout }) {
-  //   return (
-  //     <AppBar position="static" color="default" elevation={1}>
-  //       <Toolbar>
-  //         {/* <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-  //           Inventory Manager
-  //         </Typography> */}
-  //         <Button color="inherit" onClick={onLogout}>
-  //           Logout
-  //         </Button>
-  //       </Toolbar>
-  //     </AppBar>
-  //   );
-  // }
-
-  // CustomHeader.propTypes = {
-  //   onLogout: PropTypes.func.isRequired,
-  // };
-
   const ProtectedLayout = () => (
     <>
-    <AppProvider navigation={NAVIGATION} theme={demoTheme} 
-    branding={{
-    logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-    title: 'Avesh Home Solutions',
-  }}>
-    <DashboardLayout defaultSidebarCollapsed>
-    {/* <CustomHeader onLogout={handleLogout} /> */}
-      {/* <AppNavbar onLogout={handleLogout} /> */}
-      <Container>
-      {alert && (
+      <AppProvider
+        navigation={NAVIGATION}
+        theme={demoTheme}
+        branding={{
+          logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+          title: 'Avesh Home Solutions',
+        }}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <Container>
+            {alert && (
               <Typography variant="body1" color="error">
                 {alert.message}
-              </Typography>)}
-        <Routes>
-          <Route path="/" element={<Navigate to="/inventory" replace />} />
-          <Route
-            path="/add-product"
-            element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
-          />
-            <Route
-              path="/addStock"
-              element={<AddStockSection products={products} fetchProducts={fetchProducts} fetchSales={fetchSales} showAlert={showAlert} />}
-          />
-          <Route
-            path="/record-sale"
-            element={
-              <RecordSaleSection
-                products={products}
-                fetchProducts={fetchProducts}
-                fetchSales={fetchSales}
-                showAlert={showAlert}
+              </Typography>
+            )}
+            <Routes>
+              <Route path="/" element={<Navigate to="/inventory" replace />} />
+              <Route
+                path="/add-product"
+                element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
               />
-            }
-          />
-          <Route
-            path="/inventory"
-            element={
-              <InventorySection
-                products={products}
-                fetchProducts={fetchProducts}
-                showAlert={showAlert}
+              <Route
+                path="/addStock"
+                element={<AddStockSection products={products} fetchProducts={fetchProducts} fetchSales={fetchSales} showAlert={showAlert} />}
               />
-            }
-          />
-          <Route
-            path="/sales"
-            element={<SalesSection sales={sales} fetchSales={fetchSales}/>}
-          />
-           <Route
-                path="/logout"
-                element={<LogoutRoute onLogout={handleLogout} />}
-            />
-        </Routes>
-      </Container>
-      </DashboardLayout>
+              <Route
+                path="/record-sale"
+                element={
+                  <RecordSaleSection
+                    products={products}
+                    fetchProducts={fetchProducts}
+                    fetchSales={fetchSales}
+                    showAlert={showAlert}
+                  />
+                }
+              />
+              <Route
+                path="/inventory"
+                element={
+                  <InventorySection
+                    products={products}
+                    fetchProducts={fetchProducts}
+                    showAlert={showAlert}
+                  />
+                }
+              />
+              <Route
+                path="/sales"
+                element={<SalesSection sales={sales} fetchSales={fetchSales} />}
+              />
+              <Route path="/logout" element={<LogoutRoute onLogout={handleLogout} />} />
+              {/* Receipt route: renders the receipt view for a specific sale */}
+              <Route path="/receipt/:id" element={<SaleReceipt />} />
+            </Routes>
+          </Container>
+        </DashboardLayout>
       </AppProvider>
     </>
   );
@@ -237,7 +218,7 @@ function App() {
             element={
               <Container>
                 <div className="">
-                  <Login 
+                  <Login
                     onLogin={handleLogin}
                     adminUsername={ADMIN_USERNAME}
                     adminPassword={ADMIN_PASSWORD}
@@ -246,15 +227,9 @@ function App() {
               </Container>
             }
           />
-          <Route 
-            path="/*" 
-            element={
-              isAuthenticated ? (
-                <ProtectedLayout />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            } 
+          <Route
+            path="/*"
+            element={isAuthenticated ? <ProtectedLayout /> : <Navigate to="/login" replace />}
           />
         </Routes>
       </div>

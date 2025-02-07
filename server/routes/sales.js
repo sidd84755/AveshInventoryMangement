@@ -1,28 +1,42 @@
-// sales.js
 const express = require('express');
 const router = express.Router();
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 
-// Record sale
+// Record a sale with multiple items and a customer name.
 router.post('/', async (req, res) => {
   try {
-    const product = await Product.findById(req.body.productId);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-
-    if (product.stock < req.body.quantity) {
-      return res.status(400).json({ message: 'Insufficient stock' });
+    const { customerName, items } = req.body;
+    if (!customerName || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'Customer name and sale items are required.' });
     }
 
-    // Deduct the quantity from product stock
-    product.stock -= req.body.quantity;
-    await product.save();
+    // Validate each item: ensure product exists and there is enough stock.
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (!product) {
+        return res.status(404).json({ message: `Product not found for ID: ${item.productId}` });
+      }
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ message: `Insufficient stock for product: ${product.name}` });
+      }
+    }
 
-    // Create the sale record with the new salePrice field
+    // Deduct stock for each sale item.
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    // Create the sale record.
     const sale = new Sale({
-      product: req.body.productId,
-      quantity: req.body.quantity,
-      salePrice: req.body.salePrice,
+      customerName,
+      items: items.map(item => ({
+        product: item.productId,
+        quantity: item.quantity,
+        salePrice: item.salePrice,
+      })),
     });
 
     const newSale = await sale.save();
@@ -32,19 +46,29 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get recent sales
+// Get recent sales with populated product info in each sale item.
 router.get('/', async (req, res) => {
   try {
     const sales = await Sale.find()
       .sort('-saleDate')
-      // .limit(10)
-      .populate('product');
+      .populate('items.product');
     res.json(sales);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-
+// Get a single sale by ID with populated product info (for the receipt view)
+router.get('/:id', async (req, res) => {
+  try {
+    const sale = await Sale.findById(req.params.id).populate('items.product');
+    if (!sale) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    res.json(sale);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Alert } from 'react-bootstrap';
+import Alert from '@mui/material/Alert';
 import AppNavbar from './components/Navbar';
 import Login from './components/Login';
 import AddProductSection from './components/Sections/AddProductSection';
@@ -14,44 +14,52 @@ import SaleReceipt from './components/SaleReceipt'; // Import your receipt compo
 import { createTheme } from '@mui/material/styles';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, Box, CircularProgress } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PropTypes from 'prop-types';
 import './App.css';
+import { Logo } from './assets';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+// import LogoutIcon from '@mui/icons-material/Logout';
 
 const NAVIGATION = [
   { kind: 'header', title: 'Main items' },
   {
     segment: 'inventory',
     title: 'Inventory',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'sales',
-    title: 'Sales',
-    icon: <TimelineIcon />,
+    icon: <Inventory2Icon style={{ fill: '#1565C0' }}/>,
   },
   {
     segment: 'add-product',
     title: 'Add Product',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'addStock',
-    title: 'Add Stock',
-    icon: <DashboardIcon />,
+    icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
   },
   {
     segment: 'record-sale',
     title: 'Record Sale',
-    icon: <TimelineIcon />,
+    icon: <ReceiptLongIcon style={{ fill: '#1565C0' }}/>,
   },
+  {
+    segment: 'addStock',
+    title: 'Add Stock',
+    icon: <SystemUpdateAltIcon style={{ fill: '#1565C0' }}/>,
+  },
+  {
+    segment: 'sales',
+    title: 'Sales',
+    icon: <PointOfSaleIcon style={{ fill: '#1565C0' }}/>,
+  },
+  
   {
     segment: 'logout',
     title: 'Logout',
-    icon: <LogoutIcon />,
+    icon: <LogoutIcon style={{ fill: '#1565C0' }}/>,
   },
 ];
 
@@ -91,6 +99,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem('isAuthenticated') === 'true'
   );
+  const [loading, setLoading] = useState(false);
 
   // Environment variables with fallback values
   const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'admin';
@@ -139,11 +148,19 @@ function App() {
     }
   };
 
+  // useEffect(() => {
+  //   setIsAuthenticated(validateAuth());
+  //   if (isAuthenticated) {
+  //     fetchProducts();
+  //     fetchSales();
+  //   }
+  // }, [isAuthenticated]);
+
   useEffect(() => {
     setIsAuthenticated(validateAuth());
     if (isAuthenticated) {
-      fetchProducts();
-      fetchSales();
+      setLoading(true);
+      Promise.all([fetchProducts(), fetchSales()]).finally(() => setLoading(false));
     }
   }, [isAuthenticated]);
 
@@ -153,56 +170,78 @@ function App() {
         navigation={NAVIGATION}
         theme={demoTheme}
         branding={{
-          logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+          logo: <img src={Logo} alt="MUI logo" />,
           title: 'Avesh Home Solutions',
         }}
       >
         <DashboardLayout defaultSidebarCollapsed>
           <Container>
+            {/* Render MUI Alert if there's an alert */}
             {alert && (
-              <Typography variant="body1" color="error">
+              <Alert severity={alert.type === 'danger' ? 'error' : alert.type} sx={{ mb: 2 }}>
                 {alert.message}
-              </Typography>
+              </Alert>
             )}
-            <Routes>
-              <Route path="/" element={<Navigate to="/inventory" replace />} />
-              <Route
-                path="/add-product"
-                element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
-              />
-              <Route
-                path="/addStock"
-                element={<AddStockSection products={products} fetchProducts={fetchProducts} fetchSales={fetchSales} showAlert={showAlert} />}
-              />
-              <Route
-                path="/record-sale"
-                element={
-                  <RecordSaleSection
-                    products={products}
-                    fetchProducts={fetchProducts}
-                    fetchSales={fetchSales}
-                    showAlert={showAlert}
-                  />
-                }
-              />
-              <Route
-                path="/inventory"
-                element={
-                  <InventorySection
-                    products={products}
-                    fetchProducts={fetchProducts}
-                    showAlert={showAlert}
-                  />
-                }
-              />
-              <Route
-                path="/sales"
-                element={<SalesSection sales={sales} fetchSales={fetchSales} />}
-              />
-              <Route path="/logout" element={<LogoutRoute onLogout={handleLogout} />} />
-              {/* Receipt route: renders the receipt view for a specific sale */}
-              <Route path="/receipt/:id" element={<SaleReceipt />} />
-            </Routes>
+            {/* Show loader while fetching data */}
+            {loading ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '80vh',
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Routes>
+                <Route path="/" element={<Navigate to="/inventory" replace />} />
+                <Route
+                  path="/add-product"
+                  element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
+                />
+                <Route
+                  path="/addStock"
+                  element={
+                    <AddStockSection
+                      products={products}
+                      fetchProducts={fetchProducts}
+                      fetchSales={fetchSales}
+                      showAlert={showAlert}
+                    />
+                  }
+                />
+                <Route
+                  path="/record-sale"
+                  element={
+                    <RecordSaleSection
+                      products={products}
+                      fetchProducts={fetchProducts}
+                      fetchSales={fetchSales}
+                      showAlert={showAlert}
+                    />
+                  }
+                />
+                <Route
+                  path="/inventory"
+                  element={
+                    <InventorySection
+                      products={products}
+                      fetchProducts={fetchProducts}
+                      showAlert={showAlert}
+                    />
+                  }
+                />
+                <Route
+                  path="/sales"
+                  element={<SalesSection sales={sales} fetchSales={fetchSales} />}
+                />
+                <Route path="/logout" element={<LogoutRoute onLogout={handleLogout} />} />
+                {/* Receipt route: renders the receipt view for a specific sale */}
+                <Route path="/receipt/:id" element={<SaleReceipt />} />
+              </Routes>
+            )}
           </Container>
         </DashboardLayout>
       </AppProvider>

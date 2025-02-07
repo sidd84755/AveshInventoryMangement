@@ -6,7 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // Your backend server address
+        // target: 'http://localhost:5000', // Your backend server address
+        target: 'https://aveshinventorymangement.onrender.com',
         changeOrigin: true,
         secure: false
       }

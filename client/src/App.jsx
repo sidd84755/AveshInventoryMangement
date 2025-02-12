@@ -9,6 +9,8 @@ import InventorySection from './components/Sections/InventorySection';
 import SalesSection from './components/Sections/SalesSection';
 import AddStockSection from './components/Sections/AddStockSection';
 import SaleReceipt from './components/SaleReceipt'; // Import your receipt component
+import SaleBill from './components/SaleBill';
+import MobileProductSection from './components/Sections/MobileProductSection';
 
 // Import MUI and Toolpad components for the sidebar layout
 import { createTheme } from '@mui/material/styles';
@@ -55,7 +57,11 @@ const NAVIGATION = [
     title: 'Sales',
     icon: <PointOfSaleIcon style={{ fill: '#1565C0' }}/>,
   },
-  
+  {
+    segment: 'mobile',
+    title: 'Mobile',
+    icon: <PointOfSaleIcon style={{ fill: '#1565C0' }}/>,
+  },
   {
     segment: 'logout',
     title: 'Logout',
@@ -129,7 +135,7 @@ function App() {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/products');
+      const res = await fetch('/api/products');
       // const res = await fetch('/api/products');
       const data = await res.json();
       setProducts(data);
@@ -141,7 +147,7 @@ function App() {
   // Fetch sales
   const fetchSales = async () => {
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/sales');
+      const res = await fetch('/api/sales');
       // const res = await fetch('/api/sales');
       const data = await res.json();
       setSales(data);
@@ -236,11 +242,22 @@ function App() {
                   }
                 />
                 <Route
+                  path="/mobile"
+                  element={
+                    <MobileProductSection
+                      products={products}
+                      fetchProducts={fetchProducts}
+                      showAlert={showAlert}
+                    />
+                  }
+                />
+                <Route
                   path="/sales"
                   element={<SalesSection sales={sales} fetchSales={fetchSales} />}
                 />
                 <Route path="/logout" element={<LogoutRoute onLogout={handleLogout} />} />
                 {/* Receipt route: renders the receipt view for a specific sale */}
+                <Route path="/receiptBill/:id" element={<SaleBill />} />
                 <Route path="/receipt/:id" element={<SaleReceipt />} />
               </Routes>
             )}

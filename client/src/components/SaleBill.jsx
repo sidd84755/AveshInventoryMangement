@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const SaleReceipt = () => {
+const SaleBill = () => {
   const { id } = useParams();
   const [sale, setSale] = useState(null);
   const receiptRef = useRef();
@@ -91,9 +91,9 @@ const SaleReceipt = () => {
       <CardContent>
         {/* Company Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant="body2">
+          {/* <Typography variant="body2">
             GSTIN: {companyInfo.gstin}
-          </Typography>
+          </Typography> */}
           <Typography variant="body2">
             Bill/Cash Memo
           </Typography>
@@ -169,10 +169,10 @@ const SaleReceipt = () => {
           <table style={{ width: '300px' }}>
             <tbody>
               <tr>
-                <td style={{ padding: 4 }}>TOTAL</td>
-                <td style={{ padding: 4 }}>₹{totalAmount.toFixed(2)}</td>
+                <td style={{ padding: 4,fontWeight: 'bold' }}>TOTAL</td>
+                <td style={{ padding: 4,fontWeight: 'bold' }}>₹{totalAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td style={{ padding: 4 }}>CGST @{taxRate}%</td>
                 <td style={{ padding: 4 }}>₹{cgst.toFixed(2)}</td>
               </tr>
@@ -183,7 +183,7 @@ const SaleReceipt = () => {
               <tr>
                 <td style={{ padding: 4, fontWeight: 'bold' }}>GRAND TOTAL</td>
                 <td style={{ padding: 4, fontWeight: 'bold' }}>₹{grandTotal.toFixed(2)}</td>
-              </tr>
+              </tr> */}
             </tbody>
           </table>
         </Box>
@@ -197,7 +197,7 @@ const SaleReceipt = () => {
             Account No: {companyInfo.bank.account} | IFSC CODE: {companyInfo.bank.ifsc}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Rs. in Words: {numberToWords(grandTotal)}
+            Rs: {numberToWords(totalAmount)}
           </Typography>
         </Box>
 
@@ -242,4 +242,4 @@ const numberToWords = (number) => {
   return "Rupees " + number.toFixed(2) + " only";
 };
 
-export default SaleReceipt;
+export default SaleBill;

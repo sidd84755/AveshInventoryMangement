@@ -26,12 +26,14 @@ const SalesList = ({ sales }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
+  // console.log(sales);
+
   // Compute aggregated totals for each sale.
   const aggregatedSales = useMemo(() => {
     return sales.map(sale => {
       const totalQuantity = sale.items.reduce((acc, item) => acc + item.quantity, 0);
       const totalCost = sale.items.reduce((acc, item) => {
-        const costPrice = item.product?.price || 0;
+        const costPrice = item.product?.costPrice || 0;
         return acc + item.quantity * costPrice;
       }, 0);
       const totalSale = sale.items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0);
@@ -116,12 +118,13 @@ const SalesList = ({ sales }) => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 'bold' }}>Customer</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Products</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold',textAlign:'center' }}>Details</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Total Quantity</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Total Cost</TableCell>
+                  {/* <TableCell sx={{ fontWeight: 'bold' }}>Total Cost</TableCell> */}
                   <TableCell sx={{ fontWeight: 'bold' }}>Total Sale</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', px:'2rem'}}>Date</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Bill</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Bill GST</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -135,8 +138,10 @@ const SalesList = ({ sales }) => {
                           <TableHead>
                             <TableRow>
                               <TableCell sx={{ fontWeight: 'bold' }}>Product</TableCell>
+                              <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
                               <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
                               <TableCell sx={{ fontWeight: 'bold' }}>Cost Price</TableCell>
+                              <TableCell sx={{ fontWeight: 'bold' }}>M.R.P</TableCell>
                               <TableCell sx={{ fontWeight: 'bold' }}>Sale Price</TableCell>
                             </TableRow>
                           </TableHead>
@@ -144,7 +149,9 @@ const SalesList = ({ sales }) => {
                             {sale.items.map((item, idx) => (
                               <TableRow key={idx}>
                                 <TableCell>{item.product?.name || 'Deleted Product'}</TableCell>
+                                <TableCell>{item.company || (item.product?.company || 'N/A')}</TableCell>
                                 <TableCell>{item.quantity}</TableCell>
+                                <TableCell>₹{(item.product?.costPrice || 0).toFixed(2)}</TableCell>
                                 <TableCell>₹{(item.product?.price || 0).toFixed(2)}</TableCell>
                                 <TableCell>₹{item.salePrice.toFixed(2)}</TableCell>
                               </TableRow>
@@ -153,9 +160,17 @@ const SalesList = ({ sales }) => {
                         </Table>
                       </TableCell>
                       <TableCell>{sale.totalQuantity}</TableCell>
-                      <TableCell>₹{sale.totalCost.toFixed(2)}</TableCell>
+                      {/* <TableCell>₹{sale.totalCost.toFixed(2)}</TableCell> */}
                       <TableCell>₹{sale.totalSale.toFixed(2)}</TableCell>
                       <TableCell>{formatDate(sale.saleDate)}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          onClick={() => navigate(`/receiptBill/${sale._id}`)}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="contained"

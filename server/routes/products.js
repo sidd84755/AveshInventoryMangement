@@ -1,3 +1,4 @@
+// product.js
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
@@ -15,9 +16,11 @@ router.get('/', async (req, res) => {
 // Create product
 router.post('/', async (req, res) => {
   const product = new Product({
+    company: req.body.company,
     name: req.body.name,
     description: req.body.description,
     price: req.body.price,
+    costPrice: req.body.costPrice,
     stock: req.body.stock
   });
 

@@ -14,6 +14,14 @@ const saleItemSchema = new mongoose.Schema({
   salePrice: {
     type: Number,
     required: true
+  },
+  company: {
+    type: String,
+    required: true
+  },
+  newDiscountPercentage: {
+    type: Number,
+    required: true
   }
 });
 

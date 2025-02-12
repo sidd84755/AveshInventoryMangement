@@ -10,6 +10,8 @@ import {
   Typography,
   Autocomplete,
   IconButton,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -17,41 +19,82 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   // State for the customer's name and multiple sale items.
   const [customerName, setCustomerName] = useState('');
   const [saleItems, setSaleItems] = useState([
-    { product: null, quantity: '', salePrice: '', currentStock: null },
+    {
+      product: null,
+      quantity: '',
+      salePrice: '',
+      currentStock: null,
+      salePriceCalcEnabled: false,
+      discountPercentage: 45, // default discount percentage (in %)
+      company: '',
+    },
   ]);
 
-  // Update a sale item field
+  // Helper function to compute Sale Price based on the product's price and discount percentage.
+  const computeSalePrice = (item) => {
+    if (!item.product || !item.discountPercentage) return '';
+    const price = parseFloat(item.product.price);
+    const discount = parseFloat(item.discountPercentage);
+    if (!price || isNaN(discount)) return '';
+    // Calculation: (price - (price * discount/100)) / 1.18
+    const tempValue = price - (price * discount) / 100;
+    const tempSalePrice = tempValue / 1.18;
+    return tempSalePrice.toFixed(2);
+  };
+
+  // Helper function to compute the new discount percentage from the computed sale price.
+  const computeNewDiscount = (item) => {
+    if (!item.product) return '';
+    const price = parseFloat(item.product.price);
+    const computedSalePrice = parseFloat(computeSalePrice(item));
+    if (!price || !computedSalePrice) return '';
+    // Calculation: |((computedSalePrice / price) * 100) - 100|
+    const newDiscount = Math.abs(((computedSalePrice / price) * 100) - 100);
+    return newDiscount.toFixed(2);
+  };
+
+  // Update a sale item field.
   const updateSaleItem = (index, field, value) => {
-    setSaleItems(prevItems => {
+    setSaleItems((prevItems) => {
       const newItems = [...prevItems];
       newItems[index] = { ...newItems[index], [field]: value };
       return newItems;
     });
   };
 
-  // When a product is selected update the product and its current stock.
+  // When a product is selected, update the product, its current stock, and company.
   const handleProductChange = (index, newProduct) => {
-    setSaleItems(prevItems => {
+    setSaleItems((prevItems) => {
       const newItems = [...prevItems];
       newItems[index].product = newProduct;
       newItems[index].currentStock = newProduct ? newProduct.stock : null;
+      newItems[index].company = newProduct ? newProduct.company : '';
       return newItems;
     });
   };
 
   // Add a new sale item row.
   const addSaleItem = () => {
-    setSaleItems(prevItems => [
+    setSaleItems((prevItems) => [
       ...prevItems,
-      { product: null, quantity: '', salePrice: '', currentStock: null },
+      {
+        product: null,
+        quantity: '',
+        salePrice: '',
+        currentStock: null,
+        salePriceCalcEnabled: false,
+        discountPercentage: 45,
+        company: '',
+      },
     ]);
   };
 
   // Remove a sale item row.
   const removeSaleItem = (index) => {
-    setSaleItems(prevItems => prevItems.filter((_, i) => i !== index));
+    setSaleItems((prevItems) => prevItems.filter((_, i) => i !== index));
   };
 
+  // Submit handler.
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -70,21 +113,42 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         showAlert(`Valid quantity is required for item ${i + 1}.`, 'danger');
         return;
       }
-      if (!item.salePrice || parseFloat(item.salePrice) < 0) {
+      // If calculation is enabled, ensure computed sale price is valid.
+      if (item.salePriceCalcEnabled && (!item.product.price || computeSalePrice(item) === '')) {
+        showAlert(`Sale price could not be computed for item ${i + 1}.`, 'danger');
+        return;
+      }
+      // Otherwise, if manually entered, validate salePrice.
+      if (
+        !item.salePriceCalcEnabled &&
+        (!item.salePrice || parseFloat(item.salePrice) < 0)
+      ) {
         showAlert(`Valid sale price is required for item ${i + 1}.`, 'danger');
         return;
       }
     }
 
     // Prepare the sale items for the backend.
-    const items = saleItems.map(item => ({
-      productId: item.product._id,
-      quantity: parseInt(item.quantity, 10),
-      salePrice: parseFloat(item.salePrice)
-    }));
+    const items = saleItems.map((item) => {
+      const computedSalePrice =
+        item.salePriceCalcEnabled && item.product
+          ? parseFloat(computeSalePrice(item))
+          : parseFloat(item.salePrice);
+      const newDiscount =
+        item.salePriceCalcEnabled && item.product
+          ? parseFloat(computeNewDiscount(item))
+          : undefined; // If not using calculation, you might omit this field.
+      return {
+        productId: item.product._id,
+        quantity: parseInt(item.quantity, 10),
+        salePrice: computedSalePrice,
+        company: item.company,
+        newDiscountPercentage: newDiscount, // Send new discount percentage to the backend.
+      };
+    });
 
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/sales', {
+      const res = await fetch('/api/sales', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -98,12 +162,22 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         throw new Error(errorData.message || 'Failed to record sale');
       }
 
-      // Refresh the products and sales, show success, and reset the form.
+      // Refresh products and sales, show success, and reset the form.
       fetchProducts();
       fetchSales();
       showAlert('Sale recorded successfully!', 'success');
       setCustomerName('');
-      setSaleItems([{ product: null, quantity: '', salePrice: '', currentStock: null }]);
+      setSaleItems([
+        {
+          product: null,
+          quantity: '',
+          salePrice: '',
+          currentStock: null,
+          salePriceCalcEnabled: false,
+          discountPercentage: 45,
+          company: '',
+        },
+      ]);
     } catch (err) {
       showAlert(err.message, 'danger');
     }
@@ -155,10 +229,19 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   borderRadius: 1,
                 }}
               >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
                   <Typography variant="subtitle1">Item {index + 1}</Typography>
                   {saleItems.length > 1 && (
-                    <IconButton color="error" onClick={() => removeSaleItem(index)}>
+                    <IconButton
+                      color="error"
+                      onClick={() => removeSaleItem(index)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   )}
@@ -167,9 +250,13 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                 <Autocomplete
                   options={products}
                   getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  isOptionEqualToValue={(option, value) =>
+                    option._id === value._id
+                  }
                   value={item.product || null}
-                  onChange={(e, newValue) => handleProductChange(index, newValue)}
+                  onChange={(e, newValue) =>
+                    handleProductChange(index, newValue)
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -180,11 +267,22 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                     />
                   )}
                 />
-                {item.currentStock !== null && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                    Current Stock: {item.currentStock}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    mt: 1,
+                  }}
+                >
+                  {item.currentStock !== null && (
+                    <Typography variant="caption" color="text.secondary">
+                      Current Stock: {item.currentStock}
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    Company Name: {item.company}
                   </Typography>
-                )}
+                </Box>
                 <TextField
                   fullWidth
                   margin="normal"
@@ -192,18 +290,69 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   type="number"
                   inputProps={{ min: 1 }}
                   value={item.quantity}
-                  onChange={(e) => updateSaleItem(index, 'quantity', e.target.value)}
+                  onChange={(e) =>
+                    updateSaleItem(index, 'quantity', e.target.value)
+                  }
                   required
                 />
+                {/* Sale Price Calculation Option */}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={item.salePriceCalcEnabled || false}
+                      onChange={(e) =>
+                        updateSaleItem(
+                          index,
+                          'salePriceCalcEnabled',
+                          e.target.checked
+                        )
+                      }
+                    />
+                  }
+                  label="Calculate Sale Price"
+                  sx={{ mt: 1 }}
+                />
+                {item.salePriceCalcEnabled && (
+                  <Box sx={{ mt: 1 }}>
+                    <TextField
+                      fullWidth
+                      label="Discount Percentage (%)"
+                      type="number"
+                      value={item.discountPercentage}
+                      onChange={(e) =>
+                        updateSaleItem(index, 'discountPercentage', e.target.value)
+                      }
+                      margin="normal"
+                    />
+                    <TextField
+                      fullWidth
+                      label="New Discount Percentage"
+                      value={computeNewDiscount(item)}
+                      margin="normal"
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Box>
+                )}
                 <TextField
                   fullWidth
                   margin="normal"
                   label="Sale Price"
                   type="number"
                   inputProps={{ min: 0, step: '0.01' }}
-                  value={item.salePrice}
-                  onChange={(e) => updateSaleItem(index, 'salePrice', e.target.value)}
+                  value={
+                    item.salePriceCalcEnabled && item.product
+                      ? computeSalePrice(item)
+                      : item.salePrice
+                  }
+                  onChange={(e) =>
+                    updateSaleItem(index, 'salePrice', e.target.value)
+                  }
                   required
+                  InputProps={
+                    item.salePriceCalcEnabled ? { readOnly: true } : {}
+                  }
                 />
               </Box>
             ))}

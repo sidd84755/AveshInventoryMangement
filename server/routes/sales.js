@@ -1,3 +1,4 @@
+// sales.js
 const express = require('express');
 const router = express.Router();
 const Sale = require('../models/Sale');
@@ -36,6 +37,8 @@ router.post('/', async (req, res) => {
         product: item.productId,
         quantity: item.quantity,
         salePrice: item.salePrice,
+        company: item.company,
+        newDiscountPercentage: item.newDiscountPercentage, // New field sent from the frontend.
       })),
     });
 

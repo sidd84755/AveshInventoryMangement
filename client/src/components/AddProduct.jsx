@@ -13,21 +13,24 @@ import Typography from '@mui/material/Typography';
 
 const AddProduct = ({ fetchProducts, showAlert }) => {
   const [formData, setFormData] = useState({
+    company: '',
     name: '',
     description: '',
     price: '',
+    costPrice: '',
     stock: '',
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/products', {
+      const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
+          costPrice: parseFloat(formData.costPrice),
           stock: parseInt(formData.stock, 10),
         }),
       });
@@ -37,9 +40,11 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
       fetchProducts();
       showAlert('Product added successfully!', 'success');
       setFormData({
+        company: '',
         name: '',
         description: '',
         price: '',
+        costPrice: '',
         stock: '',
       });
     } catch (err) {
@@ -74,6 +79,16 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               fullWidth
+              label="Company"
+              value={formData.company}
+              onChange={(e) =>
+                setFormData({ ...formData, company: e.target.value })
+              }
+              required
+              margin="normal"
+            />
+            <TextField
+              fullWidth
               label="Product Name"
               value={formData.name}
               onChange={(e) =>
@@ -103,6 +118,23 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
                   value={formData.price}
                   onChange={(e) =>
                     setFormData({ ...formData, price: e.target.value })
+                  }
+                  required
+                  margin="normal"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">₹</InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Cost Price"
+                  type="number"
+                  inputProps={{ step: '0.01', min: '0' }}
+                  value={formData.costPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, costPrice: e.target.value })
                   }
                   required
                   margin="normal"

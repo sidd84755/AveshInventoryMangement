@@ -31,7 +31,7 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const res = await fetch(`https://aveshinventorymangement.onrender.com/api/products/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed to delete product');
         fetchProducts();
         showAlert('Product deleted successfully!', 'success');
@@ -103,9 +103,11 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
             <Table aria-label="inventory table">
               <TableHead>
                 <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Product</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Price</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Cost Price</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Stock</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Total Price</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
@@ -117,9 +119,11 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
                     const totalPrice = product.price * product.stock;
                     return (
                       <TableRow key={product._id}>
+                        <TableCell>{product.company}</TableCell>
                         <TableCell>{product.name}</TableCell>
                         <TableCell>{product.description}</TableCell>
                         <TableCell>₹{product.price.toFixed(2)}</TableCell>
+                        <TableCell>₹{product.costPrice}</TableCell>
                         <TableCell>
                           <Typography
                             sx={{

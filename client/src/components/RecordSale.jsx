@@ -148,7 +148,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
     });
 
     try {
-      const res = await fetch('/api/sales', {
+      const res = await fetch('https://aveshinventorymangement.onrender.com/api/sales', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -21,7 +21,7 @@ const saleItemSchema = new mongoose.Schema({
   },
   newDiscountPercentage: {
     type: Number,
-    required: true
+    required: false
   }
 });
 

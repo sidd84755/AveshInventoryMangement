@@ -64,7 +64,7 @@ const MobileProduct = ({ products = [], fetchProducts, showAlert }) => {
     }
 
     try {
-      const response = await fetch('/api/mobile', {
+      const response = await fetch('https://aveshinventorymangement.onrender.com/api/mobile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

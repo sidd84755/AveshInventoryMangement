@@ -27,7 +27,7 @@ const SaleReceipt = () => {
   useEffect(() => {
     const fetchSale = async () => {
       try {
-        const response = await fetch(`/api/sales/${id}`); // Ensure this endpoint is implemented in your backend.
+        const response = await fetch(`https://aveshinventorymangement.onrender.com/api/sales/${id}`); // Ensure this endpoint is implemented in your backend.
         if (!response.ok) {
           throw new Error('Sale not found');
         }

@@ -11,6 +11,7 @@ import AddStockSection from './components/Sections/AddStockSection';
 import SaleReceipt from './components/SaleReceipt'; // Import your receipt component
 import SaleBill from './components/SaleBill';
 import MobileProductSection from './components/Sections/MobileProductSection';
+import { BG } from './assets';
 
 // Import MUI and Toolpad components for the sidebar layout
 import { createTheme } from '@mui/material/styles';
@@ -135,7 +136,7 @@ function App() {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('https://aveshinventorymangement.onrender.com/api/products');
       // const res = await fetch('/api/products');
       const data = await res.json();
       setProducts(data);
@@ -147,7 +148,7 @@ function App() {
   // Fetch sales
   const fetchSales = async () => {
     try {
-      const res = await fetch('/api/sales');
+      const res = await fetch('https://aveshinventorymangement.onrender.com/api/sales');
       // const res = await fetch('/api/sales');
       const data = await res.json();
       setSales(data);

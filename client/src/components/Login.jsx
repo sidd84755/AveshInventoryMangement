@@ -12,6 +12,7 @@ import {
   Avatar,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { BG } from '../assets';
 
 const Login = ({ onLogin, adminUsername, adminPassword }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -42,6 +43,7 @@ const Login = ({ onLogin, adminUsername, adminPassword }) => {
         alignItems: 'center',
         justifyContent: 'center',
         p: 2,
+        
       }}
     >
       <Card sx={{ width: 350, boxShadow: 3 }}>

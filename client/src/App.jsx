@@ -4,6 +4,7 @@ import Alert from '@mui/material/Alert';
 import AppNavbar from './components/Navbar';
 import Login from './components/Login';
 import AddProductSection from './components/Sections/AddProductSection';
+import BulkUploadSection from './components/Sections/BulkUploadSection';
 import RecordSaleSection from './components/Sections/RecordSaleSection';
 import InventorySection from './components/Sections/InventorySection';
 import SalesSection from './components/Sections/SalesSection';
@@ -41,6 +42,11 @@ const NAVIGATION = [
   {
     segment: 'add-product',
     title: 'Add Product',
+    icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
+  },
+  {
+    segment: 'bulk-upload',
+    title: 'Bulk Upload',
     icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
   },
   {
@@ -209,6 +215,10 @@ function App() {
                 <Route
                   path="/add-product"
                   element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}
+                />
+                <Route
+                  path="/bulk-upload"
+                  element={<BulkUploadSection fetchProducts={fetchProducts} showAlert={showAlert} />}
                 />
                 <Route
                   path="/addStock"

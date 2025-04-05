@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const cloudinary = require('cloudinary').v2;
+// const cloudinary = require('cloudinary').v2;
 
 const app = express();
 
@@ -33,11 +33,11 @@ secondaryDbConnection.on('error', (err) => {
 secondaryDbConnection.once('open', () => {
   console.log('Connected to Secondary MongoDB');
 });
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// cloudinary.config({ 
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET
+// });
 
 // Routes (Keep the existing routes and add the new one)
 app.use('/api/products', require('./routes/products'));

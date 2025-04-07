@@ -24,6 +24,18 @@ module.exports = (secondaryConn) => {
     }
   });
 
+  router.get('/id', async (req, res) => {
+    try {
+      const mobile = await Mobile.findById(req.params.id);
+      if (!mobile) {
+        return res.status(404).json({ message: 'Mobile not found' });
+      }
+      res.json(mobile);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // Create new mobile entry
   router.post('/', async (req, res) => {
     try {

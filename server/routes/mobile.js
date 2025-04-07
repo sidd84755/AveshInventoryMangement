@@ -1,16 +1,24 @@
-// routes/mobile.js
 const express = require('express');
+const mongoose = require('mongoose');
 const mobileSchema = require('../models/Mobile');
 
-module.exports = (connection) => {
+module.exports = (secondaryConn) => {
   const router = express.Router();
-  const Mobile = connection.model('Mobile', mobileSchema);
+  const Mobile = secondaryConn.model('Mobile', mobileSchema);
+  const Product = mongoose.model('Product'); // primary connection
 
-  // GET all mobile entries
   router.get('/', async (req, res) => {
     try {
-      const mobiles = await Mobile.find().populate('productId', 'name description');
-      res.json(mobiles);
+      const mobiles = await Mobile.find();
+      // manually fetch products
+      const populated = await Promise.all(mobiles.map(async m => {
+        const product = await Product.findById(m.productId, 'name description');
+        return {
+          ...m.toObject(),
+          product,
+        };
+      }));
+      res.json(populated);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

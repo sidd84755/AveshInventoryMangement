@@ -24,13 +24,20 @@ module.exports = (secondaryConn) => {
     }
   });
 
-  router.get('/id', async (req, res) => {
+  router.get('/:id', async (req, res) => {
     try {
       const mobile = await Mobile.findById(req.params.id);
       if (!mobile) {
         return res.status(404).json({ message: 'Mobile not found' });
       }
-      res.json(mobile);
+      // Fetch the associated product
+      const product = await Product.findById(mobile.productId, 'name description');
+      // Combine mobile and product data
+      const populated = {
+        ...mobile.toObject(),
+        product,
+      };
+      res.json(populated);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

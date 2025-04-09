@@ -30,6 +30,14 @@ const saleSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  customerAddress: {
+    type: String,
+    required: true,
+  },
+  customerPhoneNumber: {
+    type: Number,
+    required: true,
+  },
   items: [saleItemSchema],
   saleDate: { 
     type: Date, 

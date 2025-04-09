@@ -7,9 +7,9 @@ const Product = require('../models/Product');
 // Record a sale with multiple items and a customer name.
 router.post('/', async (req, res) => {
   try {
-    const { customerName, items } = req.body;
-    if (!customerName || !items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: 'Customer name and sale items are required.' });
+    const { customerName, customerAddress, customerPhoneNumber, items } = req.body;
+    if (!customerName || !customerAddress || !customerPhoneNumber || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'Customer name, adresss, number and sale items are required.' });
     }
 
     // Validate each item: ensure product exists and there is enough stock.
@@ -33,6 +33,8 @@ router.post('/', async (req, res) => {
     // Create the sale record.
     const sale = new Sale({
       customerName,
+      customerAddress,
+      customerPhoneNumber,
       items: items.map(item => ({
         product: item.productId,
         quantity: item.quantity,

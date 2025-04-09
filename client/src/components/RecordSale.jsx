@@ -14,10 +14,13 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+// import { set } from 'mongoose';
 
 const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   // State for the customer's name and multiple sale items.
   const [customerName, setCustomerName] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [customerPhoneNumber, setCustomerPhoneNumber] = useState('');
   const [saleItems, setSaleItems] = useState([
     {
       product: null,
@@ -25,6 +28,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
       salePrice: '',
       currentStock: null,
       salePriceCalcEnabled: false,
+      directSalePriceCalcEnabled: false, // <-- New flag
       discountPercentage: 45, // default discount percentage (in %)
       company: '',
     },
@@ -51,6 +55,19 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
     // Calculation: |((computedSalePrice / price) * 100) - 100|
     const newDiscount = Math.abs(((computedSalePrice / price) * 100) - 100);
     return newDiscount.toFixed(2);
+  };
+
+  // NEW helper function to compute direct sale price from the product's price
+  // by applying a percentage directly, e.g. price * (percentage / 100).
+  const computeDirectSalePrice = (item) => {
+    if (!item.product || !item.discountPercentage) return '';
+    const price = parseFloat(item.product.price);
+    const discount = parseFloat(item.discountPercentage);
+    if (!price || isNaN(discount)) return '';
+    // Calculation: direct sale price = price * (discountPercentage / 100)
+    const directSale1 = price * (discount / 100);
+    const directSale = price - directSale1;
+    return directSale.toFixed(2);
   };
 
   // Update a sale item field.
@@ -83,6 +100,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         salePrice: '',
         currentStock: null,
         salePriceCalcEnabled: false,
+        directSalePriceCalcEnabled: false, // <-- New flag
         discountPercentage: 45,
         company: '',
       },
@@ -103,6 +121,14 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
       showAlert('Customer name is required.', 'danger');
       return;
     }
+    if (!customerAddress.trim()) {
+      showAlert('Customer address is required.', 'danger');
+      return;
+    }
+    if (!customerPhoneNumber.trim()) {
+      showAlert('Customer phone number is required.', 'danger');
+      return;
+    }
     for (let i = 0; i < saleItems.length; i++) {
       const item = saleItems[i];
       if (!item.product) {
@@ -113,14 +139,20 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         showAlert(`Valid quantity is required for item ${i + 1}.`, 'danger');
         return;
       }
-      // If calculation is enabled, ensure computed sale price is valid.
-      if (item.salePriceCalcEnabled && (!item.product.price || computeSalePrice(item) === '')) {
+      // Validate computed sale price if a calculation method is enabled.
+      if (
+        (item.salePriceCalcEnabled || item.directSalePriceCalcEnabled) &&
+        (!item.product.price ||
+          (item.salePriceCalcEnabled && computeSalePrice(item) === '') ||
+          (item.directSalePriceCalcEnabled && computeDirectSalePrice(item) === ''))
+      ) {
         showAlert(`Sale price could not be computed for item ${i + 1}.`, 'danger');
         return;
       }
       // Otherwise, if manually entered, validate salePrice.
       if (
         !item.salePriceCalcEnabled &&
+        !item.directSalePriceCalcEnabled &&
         (!item.salePrice || parseFloat(item.salePrice) < 0)
       ) {
         showAlert(`Valid sale price is required for item ${i + 1}.`, 'danger');
@@ -133,6 +165,8 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
       const computedSalePrice =
         item.salePriceCalcEnabled && item.product
           ? parseFloat(computeSalePrice(item))
+          : item.directSalePriceCalcEnabled && item.product
+          ? parseFloat(computeDirectSalePrice(item))
           : parseFloat(item.salePrice);
       const newDiscount =
         item.salePriceCalcEnabled && item.product
@@ -153,6 +187,8 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerName,
+          customerAddress,
+          customerPhoneNumber,
           items,
         }),
       });
@@ -167,6 +203,8 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
       fetchSales();
       showAlert('Sale recorded successfully!', 'success');
       setCustomerName('');
+      setCustomerAddress('');
+      setCustomerPhoneNumber('');
       setSaleItems([
         {
           product: null,
@@ -174,6 +212,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
           salePrice: '',
           currentStock: null,
           salePriceCalcEnabled: false,
+          directSalePriceCalcEnabled: false,
           discountPercentage: 45,
           company: '',
         },
@@ -216,6 +255,24 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
               variant="outlined"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
+              required
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Customer Name"
+              variant="outlined"
+              value={customerPhoneNumber}
+              onChange={(e) => setCustomerPhoneNumber(e.target.value)}
+              required
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Customer Name"
+              variant="outlined"
+              value={customerAddress}
+              onChange={(e) => setCustomerAddress(e.target.value)}
               required
             />
             {/* Render each sale item */}
@@ -312,28 +369,47 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   label="Calculate Sale Price"
                   sx={{ mt: 1 }}
                 />
-                {item.salePriceCalcEnabled && (
-                  <Box sx={{ mt: 1 }}>
-                    <TextField
-                      fullWidth
-                      label="Discount Percentage (%)"
-                      type="number"
-                      value={item.discountPercentage}
+                {/* New Direct Sale Price Calculation Option */}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={item.directSalePriceCalcEnabled || false}
                       onChange={(e) =>
-                        updateSaleItem(index, 'discountPercentage', e.target.value)
+                        updateSaleItem(
+                          index,
+                          'directSalePriceCalcEnabled',
+                          e.target.checked
+                        )
                       }
-                      margin="normal"
                     />
-                    <TextField
-                      fullWidth
-                      label="New Discount Percentage"
-                      value={computeNewDiscount(item)}
-                      margin="normal"
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Box>
+                  }
+                  label="Calculate Direct Sale Price"
+                  sx={{ mt: 1 }}
+                />
+                {/* Show discount percentage input if any calculation is enabled */}
+                {(item.salePriceCalcEnabled || item.directSalePriceCalcEnabled) && (
+                  <TextField
+                    fullWidth
+                    label="Discount Percentage (%)"
+                    type="number"
+                    value={item.discountPercentage}
+                    onChange={(e) =>
+                      updateSaleItem(index, 'discountPercentage', e.target.value)
+                    }
+                    margin="normal"
+                  />
+                )}
+                {/* Show New Discount Percentage only for the original calculated sale price */}
+                {item.salePriceCalcEnabled && (
+                  <TextField
+                    fullWidth
+                    label="New Discount Percentage"
+                    value={computeNewDiscount(item)}
+                    margin="normal"
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
                 )}
                 <TextField
                   fullWidth
@@ -344,6 +420,8 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   value={
                     item.salePriceCalcEnabled && item.product
                       ? computeSalePrice(item)
+                      : item.directSalePriceCalcEnabled && item.product
+                      ? computeDirectSalePrice(item)
                       : item.salePrice
                   }
                   onChange={(e) =>
@@ -351,7 +429,9 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   }
                   required
                   InputProps={
-                    item.salePriceCalcEnabled ? { readOnly: true } : {}
+                    (item.salePriceCalcEnabled || item.directSalePriceCalcEnabled)
+                      ? { readOnly: true }
+                      : {}
                   }
                 />
               </Box>

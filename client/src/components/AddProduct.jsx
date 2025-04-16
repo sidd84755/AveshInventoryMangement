@@ -10,6 +10,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { Link } from 'react-router-dom';
 
 const AddProduct = ({ fetchProducts, showAlert }) => {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               sx={{ display: 'flex', alignItems: 'center' }}
             >
               <span role="img" aria-label="inventory" style={{ marginRight: 8 }}>
-              📦
+                📦
               </span>
               Add New Product
             </Typography>
@@ -167,6 +168,15 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               sx={{ mt: 3 }}
             >
               Add Product
+            </Button>
+            <Button
+              component={Link}
+              to="/bulk-upload"
+              variant="outlined"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Bulk Upload
             </Button>
           </Box>
         </CardContent>

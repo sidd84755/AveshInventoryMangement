@@ -14,7 +14,7 @@ const SaleReceipt = () => {
     name: "AVESH TRADING COMPANY",
     address: "Plot No. 3, Allu Nagar Diguriya, Near-IIM Chauraha, Lucknow",
     gstin: "09ABNFA6381J12W",
-    mobiles: ["9338803280", "7318240716"],
+    mobiles: ["9338803280", "8429223683"],
     email: "aveshumar@gmail.com",
     bank: {
       name: "................................",
@@ -118,12 +118,14 @@ const SaleReceipt = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
           <Box>
             <Typography>Name: {sale.customerName}</Typography>
+            <Typography>Phone Number: {sale.customerPhoneNumber}</Typography>
             <Typography>State: {sale.state || "Uttar Pradesh"}</Typography>
             <Typography>GSTIN: {sale.gstin || "N/A"}</Typography>
           </Box>
           <Box>
             <Typography>Cash Memo No: {sale._id}</Typography>
             <Typography>Date: {new Date(sale.saleDate).toLocaleDateString()}</Typography>
+            <Typography>Address: {sale.customerAddress}</Typography>
             <Typography>Place of Supply: {sale.placeOfSupply || "Lucknow"}</Typography>
           </Box>
         </Box>
@@ -144,7 +146,7 @@ const SaleReceipt = () => {
               <tr key={idx}>
                 <td style={{ border: '1px solid #000', padding: 8 }}>{idx + 1}</td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>
-                  {item.product?.name || 'Deleted Product'}
+                  {item.product?.name + ' ' + item.product?.description || 'Deleted Product'}
                 </td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>
                   {item.product?.hsnCode || '-'}
@@ -152,9 +154,16 @@ const SaleReceipt = () => {
                 <td style={{ border: '1px solid #000', padding: 8 }}>{item.quantity}</td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>{item.product.price}</td>
                 
-                <td style={{ border: '1px solid #000', padding: 8 }}>{item.newDiscountPercentage !== undefined
-                                    ? parseFloat(item.newDiscountPercentage).toFixed(2)
-                                    : 'N/A'}</td>
+                <td style={{ border: '1px solid #000', padding: 8 }}>
+                  {item.newDiscountPercentage !== undefined
+                    ? parseFloat(item.newDiscountPercentage).toFixed(2)
+                    : (
+                        item.product?.price
+                          ? (((item.product.price - item.salePrice) / item.product.price) * 100).toFixed(2)
+                          : 'N/A'
+                      )}
+                  %
+                </td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>₹{item.salePrice.toFixed(2)}</td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>
                   ₹{(item.quantity * item.salePrice).toFixed(2)}
@@ -206,7 +215,7 @@ const SaleReceipt = () => {
             Terms & Conditions:
           </Typography>
           <Typography variant="body2">
-            1. Payment will be after the delivery of Goods.
+            1. Payment will be before the delivery of Goods.
           </Typography>
           <Typography variant="body2">
             2. Price inclusive of all taxes.

@@ -1,4 +1,3 @@
-// RecordSale.jsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -14,7 +13,6 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-// import { set } from 'mongoose';
 
 const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
   // State for the customer's name and multiple sale items.
@@ -260,7 +258,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
             <TextField
               fullWidth
               margin="normal"
-              label="Customer Name"
+              label="Customer Phone Number"
               variant="outlined"
               value={customerPhoneNumber}
               onChange={(e) => setCustomerPhoneNumber(e.target.value)}
@@ -269,7 +267,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
             <TextField
               fullWidth
               margin="normal"
-              label="Customer Name"
+              label="Customer Address"
               variant="outlined"
               value={customerAddress}
               onChange={(e) => setCustomerAddress(e.target.value)}
@@ -295,10 +293,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                 >
                   <Typography variant="subtitle1">Item {index + 1}</Typography>
                   {saleItems.length > 1 && (
-                    <IconButton
-                      color="error"
-                      onClick={() => removeSaleItem(index)}
-                    >
+                    <IconButton color="error" onClick={() => removeSaleItem(index)}>
                       <DeleteIcon />
                     </IconButton>
                   )}
@@ -306,14 +301,14 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                 {/* Product Autocomplete */}
                 <Autocomplete
                   options={products}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) =>
-                    option._id === value._id
+                  getOptionLabel={(option) =>
+                    option.description
+                      ? `${option.name} - ${option.description}`
+                      : option.name
                   }
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
                   value={item.product || null}
-                  onChange={(e, newValue) =>
-                    handleProductChange(index, newValue)
-                  }
+                  onChange={(e, newValue) => handleProductChange(index, newValue)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -347,9 +342,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                   type="number"
                   inputProps={{ min: 1 }}
                   value={item.quantity}
-                  onChange={(e) =>
-                    updateSaleItem(index, 'quantity', e.target.value)
-                  }
+                  onChange={(e) => updateSaleItem(index, 'quantity', e.target.value)}
                   required
                 />
                 {/* Sale Price Calculation Option */}
@@ -358,11 +351,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                     <Checkbox
                       checked={item.salePriceCalcEnabled || false}
                       onChange={(e) =>
-                        updateSaleItem(
-                          index,
-                          'salePriceCalcEnabled',
-                          e.target.checked
-                        )
+                        updateSaleItem(index, 'salePriceCalcEnabled', e.target.checked)
                       }
                     />
                   }
@@ -375,11 +364,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                     <Checkbox
                       checked={item.directSalePriceCalcEnabled || false}
                       onChange={(e) =>
-                        updateSaleItem(
-                          index,
-                          'directSalePriceCalcEnabled',
-                          e.target.checked
-                        )
+                        updateSaleItem(index, 'directSalePriceCalcEnabled', e.target.checked)
                       }
                     />
                   }
@@ -424,9 +409,7 @@ const RecordSale = ({ products, fetchProducts, fetchSales, showAlert }) => {
                       ? computeDirectSalePrice(item)
                       : item.salePrice
                   }
-                  onChange={(e) =>
-                    updateSaleItem(index, 'salePrice', e.target.value)
-                  }
+                  onChange={(e) => updateSaleItem(index, 'salePrice', e.target.value)}
                   required
                   InputProps={
                     (item.salePriceCalcEnabled || item.directSalePriceCalcEnabled)

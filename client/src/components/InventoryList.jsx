@@ -1,4 +1,3 @@
-// InventoryList.jsx
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -41,10 +40,13 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
     }
   };
 
-  // Filter products based on search query (case-insensitive)
+  // Filter products based on search query (case-insensitive) in company, name, or description
   const filteredProducts = useMemo(() => {
+    const query = searchQuery.toLowerCase();
     return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      product.company.toLowerCase().includes(query) ||
+      product.name.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
     );
   }, [products, searchQuery]);
 
@@ -128,8 +130,7 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
                           <Typography
                             sx={{
                               fontWeight: 'bold',
-                              color:
-                                product.stock < 10 ? 'error.main' : 'success.main',
+                              color: product.stock < 10 ? 'error.main' : 'success.main',
                             }}
                           >
                             {product.stock}
@@ -151,7 +152,7 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
+                    <TableCell colSpan={8} align="center">
                       No products available.
                     </TableCell>
                   </TableRow>

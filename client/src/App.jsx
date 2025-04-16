@@ -9,6 +9,7 @@ import RecordSaleSection from './components/Sections/RecordSaleSection';
 import InventorySection from './components/Sections/InventorySection';
 import SalesSection from './components/Sections/SalesSection';
 import AddStockSection from './components/Sections/AddStockSection';
+import DashboardSection from './components/Sections/DashboardSection';
 import SaleReceipt from './components/SaleReceipt'; // Import your receipt component
 import SaleBill from './components/SaleBill';
 import MobileProductSection from './components/Sections/MobileProductSection';
@@ -30,10 +31,17 @@ import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import MobileScreenShareIcon from '@mui/icons-material/MobileScreenShare';
+
 // import LogoutIcon from '@mui/icons-material/Logout';
 
 const NAVIGATION = [
   { kind: 'header', title: 'Main items' },
+  {
+    segment: 'dash',
+    title: 'Dashboard',
+    icon: <DashboardIcon style={{ fill: '#1565C0' }}/>,
+  },
   {
     segment: 'inventory',
     title: 'Inventory',
@@ -44,11 +52,11 @@ const NAVIGATION = [
     title: 'Add Product',
     icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
   },
-  {
-    segment: 'bulk-upload',
-    title: 'Bulk Upload',
-    icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
-  },
+  // {
+  //   segment: 'bulk-upload',
+  //   title: 'Bulk Upload',
+  //   icon: <PostAddIcon style={{ fill: '#1565C0' }}/>,
+  // },
   {
     segment: 'record-sale',
     title: 'Record Sale',
@@ -67,7 +75,7 @@ const NAVIGATION = [
   {
     segment: 'mobile',
     title: 'Mobile',
-    icon: <PointOfSaleIcon style={{ fill: '#1565C0' }}/>,
+    icon: <MobileScreenShareIcon style={{ fill: '#1565C0' }}/>,
   },
   {
     segment: 'logout',
@@ -211,7 +219,11 @@ function App() {
               </Box>
             ) : (
               <Routes>
-                <Route path="/" element={<Navigate to="/inventory" replace />} />
+                <Route path="/" element={<Navigate to="/dash" replace />} />
+                <Route
+                  path="/dash"
+                  element={<DashboardSection/>}
+                />
                 <Route
                   path="/add-product"
                   element={<AddProductSection fetchProducts={fetchProducts} showAlert={showAlert} />}

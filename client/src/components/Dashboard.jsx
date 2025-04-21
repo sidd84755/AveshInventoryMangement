@@ -131,7 +131,7 @@ const Dashboard = () => {
 
   // Compute All-Time Metrics
   const totalInventoryValue = products.reduce(
-    (acc, product) => acc + product.price * product.stock, 0
+    (acc, product) => acc + product.costPrice * product.stock, 0
   );
 
   const totalSalesAllTime = sales.reduce((acc, sale) => {

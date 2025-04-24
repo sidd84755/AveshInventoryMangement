@@ -76,4 +76,83 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = req.body;
+    const sale = await Sale.findById(req.params.id);
+    if (!sale) return res.status(404).json({ message: 'Sale not found' });
+
+    // 1. Update customer info
+    sale.customerName = updated.customerName;
+    sale.customerAddress = updated.customerAddress;
+    sale.customerPhoneNumber = updated.customerPhoneNumber;
+
+    // 2. Map original quantities
+    const origQtyMap = {};
+    sale.items.forEach(i => {
+      origQtyMap[i.product.toString()] = i.quantity;
+    });
+
+    // 3. Adjust stock based on delta
+    for (const item of updated.items) {
+      const prodId = item.product._id || item.product;
+      const product = await Product.findById(prodId);
+      if (!product) {
+        return res.status(404).json({ message: `Product ${prodId} not found` });
+      }
+
+      const origQty = origQtyMap[prodId] || 0;
+      const delta = item.quantity - origQty;
+      // If delta > 0, more sold → deduct; if delta < 0, items returned → add back
+      if (delta > 0 && product.stock < delta) {
+        return res
+          .status(400)
+          .json({ message: `Insufficient stock for ${product.name}` });
+      }
+      product.stock -= delta;
+      await product.save();
+    }
+
+    // 4. Save updated items array
+    sale.items = updated.items.map(i => ({
+      product: i.product._id || i.product,
+      quantity: i.quantity,
+      salePrice: i.salePrice,
+      company: i.company
+    }));
+
+    await sale.save();
+    res.json(sale);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    // 1. Find the sale
+    const sale = await Sale.findById(req.params.id);
+    if (!sale) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+
+    // 2. Restock each product
+    for (const item of sale.items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+    }
+
+    // 3. Remove the sale record
+    await sale.remove();
+
+    res.json({ message: 'Sale deleted and stock updated' });
+  } catch (err) {
+    console.error('Error deleting sale:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

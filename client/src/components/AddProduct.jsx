@@ -30,9 +30,10 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          price: parseFloat(formData.price),
-          costPrice: parseFloat(formData.costPrice),
-          stock: parseInt(formData.stock, 10),
+          // fallback to 0 if empty or invalid
+          price: parseFloat(formData.price) || 0,
+          costPrice: parseFloat(formData.costPrice) || 0,
+          stock: parseInt(formData.stock, 10) || 0,
         }),
       });
 
@@ -82,9 +83,7 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               fullWidth
               label="Company"
               value={formData.company}
-              onChange={(e) =>
-                setFormData({ ...formData, company: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
               required
               margin="normal"
             />
@@ -92,9 +91,7 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               fullWidth
               label="Product Name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
               margin="normal"
             />
@@ -102,9 +99,7 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               fullWidth
               label="Description"
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               multiline
               rows={3}
               margin="normal"
@@ -113,19 +108,14 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Price"
+                  label="Price/M.R.P"
                   type="number"
                   inputProps={{ step: '0.01', min: '0' }}
                   value={formData.price}
-                  onChange={(e) =>
-                    setFormData({ ...formData, price: e.target.value })
-                  }
-                  required
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   margin="normal"
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">₹</InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
                   }}
                 />
                 <TextField
@@ -134,15 +124,11 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
                   type="number"
                   inputProps={{ step: '0.01', min: '0' }}
                   value={formData.costPrice}
-                  onChange={(e) =>
-                    setFormData({ ...formData, costPrice: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
                   required
                   margin="normal"
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">₹</InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
                   }}
                 />
               </Grid>
@@ -153,20 +139,13 @@ const AddProduct = ({ fetchProducts, showAlert }) => {
                   type="number"
                   inputProps={{ min: '0' }}
                   value={formData.stock}
-                  onChange={(e) =>
-                    setFormData({ ...formData, stock: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                   required
                   margin="normal"
                 />
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{ mt: 3 }}
-            >
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
               Add Product
             </Button>
             <Button

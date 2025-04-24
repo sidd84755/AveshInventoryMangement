@@ -134,7 +134,7 @@ const SaleReceipt = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
           <thead>
             <tr>
-              {["S.N", "PARTICULAR", "HSN/SAC CODE", "QTY", "M.R.P", "Discount %", "RATE", "AMOUNT"].map((header) => (
+              {["S.N", "PARTICULAR", "HSN/SAC CODE", "QTY", "Discount %", "RATE", "AMOUNT"].map((header) => (
                 <th key={header} style={{ border: '1px solid #000', padding: 8, textAlign: 'left' }}>
                   {header}
                 </th>
@@ -152,7 +152,7 @@ const SaleReceipt = () => {
                   {item.product?.hsnCode || '-'}
                 </td>
                 <td style={{ border: '1px solid #000', padding: 8 }}>{item.quantity}</td>
-                <td style={{ border: '1px solid #000', padding: 8 }}>{item.product.price}</td>
+                {/* <td style={{ border: '1px solid #000', padding: 8 }}>{item.product.price}</td> */}
                 
                 <td style={{ border: '1px solid #000', padding: 8 }}>
                   {item.newDiscountPercentage !== undefined

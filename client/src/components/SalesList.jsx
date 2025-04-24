@@ -80,14 +80,14 @@ const SalesList = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Customer</TableCell>
-                  <TableCell>Details</TableCell>
-                  <TableCell>Total Qty</TableCell>
-                  <TableCell>Total Sale</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Bill</TableCell>
-                  <TableCell>GST Bill</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Customer</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Details</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Total Qty</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Total Sale</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Bill</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>GST Bill</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -98,12 +98,12 @@ const SalesList = () => {
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Product</TableCell>
-                            <TableCell>Company</TableCell>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Cost Price</TableCell>
-                            <TableCell>M.R.P</TableCell>
-                            <TableCell>Sale Price</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Product</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Company</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Cost Price</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>M.R.P</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Sale Price</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>

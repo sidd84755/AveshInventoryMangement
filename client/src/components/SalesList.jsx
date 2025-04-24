@@ -20,7 +20,7 @@ const SalesList = () => {
   const navigate = useNavigate();
 
   const fetchSales = async () => {
-    const { data } = await axios.get('/api/sales');
+    const { data } = await axios.get('https://aveshinventorymangement.onrender.com/api/sales');
     setSales(data);
   };
   useEffect(() => { fetchSales(); }, []);
@@ -57,12 +57,12 @@ const SalesList = () => {
     setCurrentSale({ ...currentSale, items });
   };
   const handleSave = async () => {
-    try { await axios.put(`/api/sales/${currentSale._id}`, currentSale); handleCloseEdit(); fetchSales(); }
+    try { await axios.put(`https://aveshinventorymangement.onrender.com/api/sales/${currentSale._id}`, currentSale); handleCloseEdit(); fetchSales(); }
     catch { alert('Failed to update sale'); }
   };
   const handleDelete = async sale => {
     if (!window.confirm('Delete this sale? This will restock all items.')) return;
-    try { await axios.delete(`/api/sales/${sale._id}`); fetchSales(); }
+    try { await axios.delete(`https://aveshinventorymangement.onrender.com/api/sales/${sale._id}`); fetchSales(); }
     catch { alert('Failed to delete sale'); }
   };
   const formatDate = d => new Date(d).toLocaleString();

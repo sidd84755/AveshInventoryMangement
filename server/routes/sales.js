@@ -145,13 +145,17 @@ router.delete('/:id', async (req, res) => {
       }
     }
 
-    // 3. Remove the sale record
-    await sale.remove();
+    // 3. Delete the sale document
+    // Option A: call deleteOne on the document
+    await sale.deleteOne();
 
-    res.json({ message: 'Sale deleted and stock updated' });
+    // Option B: equivalently
+    // await Sale.findByIdAndDelete(req.params.id);
+
+    return res.json({ message: 'Sale deleted and stock updated' });
   } catch (err) {
     console.error('Error deleting sale:', err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 });
 

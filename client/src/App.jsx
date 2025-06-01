@@ -150,7 +150,7 @@ function App() {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/products');
+      const res = await fetch('https://aveshhomemangement.onrender.com/api/products');
       // const res = await fetch('/api/products');
       const data = await res.json();
       setProducts(data);
@@ -162,7 +162,7 @@ function App() {
   // Fetch sales
   const fetchSales = async () => {
     try {
-      const res = await fetch('https://aveshinventorymangement.onrender.com/api/sales');
+      const res = await fetch('https://aveshhomemangement.onrender.com/api/sales');
       // const res = await fetch('/api/sales');
       const data = await res.json();
       setSales(data);

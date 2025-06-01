@@ -71,8 +71,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsResponse = await fetch('https://aveshinventorymangement.onrender.com/api/products');
-        const salesResponse = await fetch('https://aveshinventorymangement.onrender.com/api/sales');
+        const productsResponse = await fetch('https://aveshhomemangement.onrender.com/api/products');
+        const salesResponse = await fetch('https://aveshhomemangement.onrender.com/api/sales');
         const productsData = await productsResponse.json();
         const salesData = await salesResponse.json();
         setProducts(productsData);

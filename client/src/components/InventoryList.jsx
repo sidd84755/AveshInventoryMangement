@@ -30,7 +30,7 @@ const InventoryList = ({ products, fetchProducts, showAlert }) => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const res = await fetch(`https://aveshinventorymangement.onrender.com/api/products/${id}`, { method: 'DELETE' });
+        const res = await fetch(`https://aveshhomemangement.onrender.com/api/products/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed to delete product');
         fetchProducts();
         showAlert('Product deleted successfully!', 'success');

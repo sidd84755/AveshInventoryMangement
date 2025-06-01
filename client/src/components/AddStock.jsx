@@ -39,7 +39,7 @@ const AddStock = ({ products, fetchProducts, showAlert }) => {
     e.preventDefault();
     try {
       const res = await fetch(
-        `https://aveshinventorymangement.onrender.com/api/products/${formData.productId}/addStock`,
+        `https://aveshhomemangement.onrender.com/api/products/${formData.productId}/addStock`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

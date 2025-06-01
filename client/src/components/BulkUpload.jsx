@@ -22,7 +22,7 @@ const BulkUpload = ({ fetchProducts, showAlert }) => {
         try {
           // fire all requests in parallel
           await Promise.all(rows.map(row =>
-            fetch('https://aveshinventorymangement.onrender.com/api/products', {
+            fetch('https://aveshhomemangement.onrender.com/api/products', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
